@@ -1,12 +1,12 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const dev = process.env.NODE_ENV === 'development';
 const prod = !dev;
 
-const fileName = ext => prod?`[name].[hash].${ext}`:`[name].${ext}`;
+const fileName = ext => prod ? `[name].[hash].${ext}` : `[name].${ext}`;
 
 module.exports = {
     context: path.resolve(__dirname, 'src'),
@@ -33,8 +33,12 @@ module.exports = {
                 loader: 'file-loader',
                 options: {
                     name: `[path]${fileName('[ext]')}`,
-                    publicPath: '../'
+                    publicPath: '../',
+                    esModule: false
                 }
+            },
+            {
+                test: /\.html$/, loader: 'html-loader'
             }
         ]
     },
