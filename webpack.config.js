@@ -1,37 +1,28 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
-const isDev = process.env.NODE_ENV === 'development';
-const isProd = !isDev;
+const dev = process.env.NODE_ENV === 'development';
+const prod = !dev;
 
-const filename = ext => isProd?`[name].[hash]${ext}`:`[name]${ext}`;
+const fileName = ext => prod?`[name].[hash].${ext}`:`[name].${ext}`;
 
 module.exports = {
     context: path.resolve(__dirname, 'src'),
-    entry: './js/mymain.js',
+    entry: './js/main.js',
     output: {
         path: path.resolve(__dirname, './dist'),
-        filename: `./js/${filename('.js')}`
+        filename: `./js/${fileName('js')}`
     },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: './index.html',
-            minify: {
-                collapseWhitespace: isProd
-            }
-        }),
-        new CleanWebpackPlugin(),
-        new MiniCssExtractPlugin({
-            filename: `css/${filename('.css')}`
-        })
-    ],
     module: {
         rules: [
             {
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
+                test: /\.js$/,
+                loader: 'babel-loader',
+                options: {
+                    presets: ['@babel/preset-env']
+                }
             },
             {
                 test: /\.s[ac]ss$/,
@@ -41,11 +32,22 @@ module.exports = {
                 test: /\.(jpg|png|gif)$/,
                 loader: 'file-loader',
                 options: {
-                    name: `[path]${filename('.[ext]')}`,
+                    name: `[path]${fileName('[ext]')}`,
                     publicPath: '../'
                 }
             }
         ]
-    }
-
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html',
+            minify: {
+                collapseWhitespace: prod
+            }
+        }),
+        new MiniCssExtractPlugin({
+            filename: `css/${fileName('css')}`
+        }),
+        new CleanWebpackPlugin()
+    ]
 };
